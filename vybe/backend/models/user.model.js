@@ -20,13 +20,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    profileImage: String,
+    profileImg: String,
+    bio: {
+      type: String,
+      default: "",
+    },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     saved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     loops: [{ type: mongoose.Schema.Types.ObjectId, ref: "Loop" }],
-    story: { type: mongoose.Schema.Types.ObjectId, ref: "Story" },
+    stories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Story" }],
   },
   { timestamps: true }
 );

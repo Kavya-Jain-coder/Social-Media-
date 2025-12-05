@@ -16,6 +16,10 @@ const storySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    caption: {
+      type: String,
+      default: "",
+    },
     viewers: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],

@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken"
 
-const isAuth = async (req, res, next) => {
+export const isAuthenticated = async (req, res, next) => {
     try {
         const token = req.cookies.token
 
-        if(!token) {
-            return res.status(400).json({
-                message: "token is not found!"
+        if (!token) {
+            return res.status(401).json({
+                message: "User not authenticated"
             })
         }
 
@@ -16,13 +16,9 @@ const isAuth = async (req, res, next) => {
 
         next()
 
-
-
-    }catch (error) {
+    } catch (error) {
         return res.status(500).json({
-            message: `isAuth error ${error}`
+            message: `Authentication error: ${error.message}`
         })
     }
 }
-
-export default isAuth;

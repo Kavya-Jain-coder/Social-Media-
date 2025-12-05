@@ -1,158 +1,127 @@
 import React, { useState } from "react";
-import logo3 from "../assets/logo3.png";
-import logo4 from "../assets/logo4.png";
-import { IoIosEye } from "react-icons/io";
-import { IoIosEyeOff } from "react-icons/io";
+import { useNavigate, Link } from "react-router-dom";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { useAuth } from "../context/AuthContext";
+
 function SignUp() {
-  const [inputClicked, setInputClicked] = useState({
-    name: false,
-    username: false,
-    email: false,
-    password: false,
-  });
-
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSignup = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/signup`, {
-        name,
-        username,
-        email,
-        password,
-      }, {withCredentials: true});
-      console.log(result.data);
+      const res = await axios.post(
+        `${serverUrl}/api/auth/signup`,
+        {
+          name,
+          email,
+          username,
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 201) {
+        // Remove password before storing
+        const { password, ...userWithoutPassword } = res.data;
+        login(userWithoutPassword);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert(error.response?.data?.message || "Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    catch (error) {
-      console.log(error);
-    }
-  }
+  };
 
   return (
-    <div className="w-full h-screen bg-gradient-to-b from-black to-gray-900 flex flex-col justify-center items-center">
-      <div className="w-[90%] lg:max-w-[60%] h-[600px] bg-white rounded-2xl flex justify-center items-center overflow-hidden border-2 border-[#1a1f23] ">
-        <div className="w-full lg:w-[50%] h-full bg-white flex flex-col items-center p-[10px] gap-[20px]">
-          <div className="flex gap-[10px] items-center text-[20px] font-semibold mt-[40px] ">
-            <span>Sign Up to</span>
-            <img src={logo3} alt="" className="w-[70px] " />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="w-full max-w-[450px] space-y-8 relative z-10 p-12 luxury-card border-white/10 shadow-2xl">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <img
+              src="/astrix_logo.png"
+              alt="Astrix"
+              className="w-12 h-12 object-contain"
+              style={{ width: '48px', height: '48px' }}
+            />
+            <span className="text-2xl font-bold text-gray-100 tracking-[0.3em]">ASTRIX</span>
           </div>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Create an account</h1>
+          <p className="text-gray-400 text-sm font-medium">Enter your information to get started</p>
+        </div>
 
-          <div
-            className="relative flex items-center justify-start w-[90%] h-[50px] rounded-2xl mt-[30px] border-2 border-black "
-            onClick={() => setInputClicked({ ...inputClicked, name: true })}
-          >
-            <label
-              htmlFor="name"
-              className={`text-gray-700 absolute left-[20px] p-[5px] bg-white text-[15px] ${
-                inputClicked.name ? "top-[-15px]" : ""
-              } `}
-            >
-              Enter Your Name
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-6">
             <input
               type="text"
-              id="name"
-              className="w-full h-full rounded-2xl px-[20px] outline-none border-0  "
-              required
+              value={name}
               onChange={(e) => setName(e.target.value)}
+              className="luxury-input border-white/10 focus:border-white/30 placeholder:text-gray-500"
+              placeholder="Full Name"
+              required
             />
-          </div>
-
-          <div
-            className="relative flex items-center justify-start w-[90%] h-[50px] rounded-2xl  border-2 border-black "
-            onClick={() => setInputClicked({ ...inputClicked, username: true })}
-          >
-            <label
-              htmlFor="username"
-              className={`text-gray-700 absolute left-[20px] p-[5px] bg-white text-[15px] ${
-                inputClicked.username ? "top-[-15px]" : ""
-              } `}
-            >
-              Enter User Name
-            </label>
             <input
               type="text"
-              id="username"
-              className="w-full h-full rounded-2xl px-[20px] outline-none border-0  "
-              required
+              value={username}
               onChange={(e) => setUsername(e.target.value)}
+              className="luxury-input border-white/10 focus:border-white/30 placeholder:text-gray-500"
+              placeholder="Username"
+              required
             />
-          </div>
-
-          <div
-            className="relative flex items-center justify-start w-[90%] h-[50px] rounded-2xl border-2 border-black "
-            onClick={() => setInputClicked({ ...inputClicked, email: true })}
-          >
-            <label
-              htmlFor="email"
-              className={`text-gray-700 absolute left-[20px] p-[5px] bg-white text-[15px] ${
-                inputClicked.email ? "top-[-15px]" : ""
-              } `}
-            >
-              Enter Your Email
-            </label>
             <input
               type="email"
-              id="email"
-              className="w-full h-full rounded-2xl px-[20px] outline-none border-0  "
-              required
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div
-            className="relative flex items-center justify-start w-[90%] h-[50px] rounded-2xl border-2 border-black "
-            onClick={() => setInputClicked({ ...inputClicked, password: true })}
-          >
-            <label
-              htmlFor="password"
-              className={`text-gray-700 absolute left-[20px] p-[5px] bg-white text-[15px] ${
-                inputClicked.password ? "top-[-15px]" : ""
-              } `}
-            >
-              Enter Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              className="w-full h-full rounded-2xl px-[20px] outline-none border-0  "
+              className="luxury-input border-white/10 focus:border-white/30 placeholder:text-gray-500"
+              placeholder="Email"
               required
-              onChange={(e) => setPassword(e.target.value)}
             />
-            {!showPassword ? (
-              <IoIosEye
-                className="absolute cursor-pointer right-[20px] w-[25px] h-[25px]"
-                onClick={() => setShowPassword(true)}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="luxury-input border-white/10 focus:border-white/30 placeholder:text-gray-500 pr-10"
+                placeholder="Password"
+                required
               />
-            ) : (
-              <IoIosEyeOff
-                className="absolute cursor-pointer right-[20px] w-[25px] h-[25px]"
-                onClick={() => setShowPassword(false)}
-              />
-            )}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-white hover:text-cyan-400 transition-colors"
+              >
+                {showPassword ? <IoMdEyeOff size={18} /> : <IoMdEye size={18} />}
+              </button>
+            </div>
           </div>
 
-          <button className="w-[70%] px-[20px] py-[10px] bg-black text-white font-semibold h-[50px] cursor-pointer rounded-2xl mt-[30px]" onClick={handleSignup}>
-            Sign Up
+          <button
+            type="submit"
+            className="btn-luxury w-full py-4 text-sm tracking-widest hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)]"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "SIGN UP"}
           </button>
-          <p className="cursor-pointer text-gray-800">
-            Already have an account?{" "}
-            <span className="border-b-2 border-b-black pb-[3px] text-black ">
-              Sign In
-            </span>
-          </p>
-        </div>
+        </form>
 
-        <div className="md:w-[50%] h-full hidden lg:flex justify-center items-center bg-[#000000] flex-col gap-[10px] text-white text-[16px] font-semibold rounded-l-[30px] shadow-2xl shadow-black ">
-          <img src={logo4} className="w-[40%]" alt="" />
-          <p>Not Just A Platform, It's A VYBE </p>
-        </div>
+        <p className="text-center text-gray-400 text-sm relative z-50 mt-10">
+          Already have an account?{' '}
+          <Link to="/signin" className="text-white font-bold hover:text-cyan-300 hover:underline decoration-2 underline-offset-4">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );
